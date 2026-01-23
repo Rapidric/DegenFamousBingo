@@ -9,6 +9,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Game from "./pages/Game";
 import Admin from "./pages/Admin";
+import Profile from "./pages/Profile"; // Import the new Profile page
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/game" element={<Game />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/profile" element={<Profile />} /> {/* Add the new Profile route */}
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

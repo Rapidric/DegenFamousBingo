@@ -3,7 +3,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { DollarSign, User } from "lucide-react";
+import { DollarSign, User, Wallet } from "lucide-react"; // Import Wallet icon
 
 const Header = () => {
   // Placeholder for user data and wallet balance
@@ -28,16 +28,21 @@ const Header = () => {
                 Admin
               </Button>
             </Link>
+            <Link to="/profile"> {/* New link to Profile page */}
+              <Button variant="ghost" className="rounded-lg text-primary hover:bg-accent hover:text-primary">
+                Profile
+              </Button>
+            </Link>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="flex items-center space-x-1 bg-accent/20 px-3 py-1 rounded-full text-sm font-medium text-primary">
+            <Link to="/profile" className="flex items-center space-x-1 bg-accent/20 px-3 py-1 rounded-full text-sm font-medium text-primary hover:bg-accent/40 transition-colors">
               <User className="h-4 w-4" />
               <span>{userName}</span>
-            </div>
-            <div className="flex items-center space-x-1 bg-accent/20 px-3 py-1 rounded-full text-sm font-medium text-primary">
+            </Link>
+            <Link to="/profile" className="flex items-center space-x-1 bg-accent/20 px-3 py-1 rounded-full text-sm font-medium text-primary hover:bg-accent/40 transition-colors">
               <DollarSign className="h-4 w-4" />
               <span>{walletBalance}</span>
-            </div>
+            </Link>
           </div>
         </nav>
       </div>

@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { BingoCard, generateBingoCard, showSuccess, showError, generateCalledNumbers, checkBingo } from "@/utils/bingo";
+import { BingoCard, generateBingoCard, showSuccess, showError, generateCalledNumbers, checkBingo, BingoCardNumber } from "@/utils/bingo";
 import BingoCardDisplay from "@/components/BingoCardDisplay";
 import { toast } from "sonner";
+import { Play, Pause, SkipForward, RotateCcw } from "lucide-react";
 
 interface PurchasedCard {
   id: string;
@@ -25,8 +26,81 @@ const Game = () => {
   const [calledNumbers, setCalledNumbers] = useState<number[]>([]);
   const [currentCalledNumber, setCurrentCalledNumber] = useState<number | null>(null);
   const [gameStarted, setGameStarted] = useState<boolean>(false);
+  const [isCallingNumbers, setIsCallingNumbers] = useState<boolean>(false); // New state for auto-calling
   const [winnerId, setWinnerId] = useState<string | null>(null);
   const calledNumbersIndexRef = useRef(0); // To keep track of which number to call next
+  const gameIntervalRef = useRef<NodeJS.Timeout | null>(null); // Ref to store the interval ID
+
+  const updateCardDaubStatus = useCallback((number: number) => {
+    setPurchasedCards(prevCards =>
+      prevCards.map(pc => {
+        const newCardData = pc.cardData.map(row =>
+          row.map(cell => {
+            if (typeof cell.value === "number" && cell.value === number) {
+              return { ...cell, isCalled: true };
+            }
+            return cell;
+          })
+        );
+        return { ...pc, cardData: newCardData };
+      })
+    );
+  }, []);
+
+  const callNextNumber = useCallback(() => {
+    if (calledNumbersIndexRef.current >= allPossibleNumbers.length) {
+      toast.warning("All numbers called! No winner this round. 😔", {
+        duration: 5000,
+        position: "top-center",
+      });
+      setGameStarted(false);
+      setIsCallingNumbers(false);
+      return;
+    }
+
+    const nextNumber = allPossibleNumbers[calledNumbersIndexRef.current];
+    setCurrentCalledNumber(nextNumber);
+    setCalledNumbers((prev) => [...prev, nextNumber]);
+    updateCardDaubStatus(nextNumber); // Update daub status on cards
+    calledNumbersIndexRef.current++;
+
+    toast.info(`Number called: ${nextNumber}! 📣`, {
+      duration: 2500,
+      position: "top-center",
+    });
+
+    // Check for bingo after each number is called
+    purchasedCards.forEach((pc) => {
+      if (checkBingo(pc.cardData, [...calledNumbers, nextNumber])) {
+        setWinnerId(pc.id);
+        setGameStarted(false); // End game on first bingo
+        setIsCallingNumbers(false); // Stop calling numbers
+        if (gameIntervalRef.current) {
+          clearInterval(gameIntervalRef.current);
+          gameIntervalRef.current = null;
+        }
+        toast.success(`BINGO! Card ${pc.id} is a winner! 🎉`, {
+          duration: 5000,
+          position: "top-center",
+        });
+      }
+    });
+  }, [purchasedCards, calledNumbers, updateCardDaubStatus]);
+
+  useEffect(() => {
+    if (gameStarted && isCallingNumbers && !winnerId) {
+      gameIntervalRef.current = setInterval(callNextNumber, 3000); // Call a number every 3 seconds
+    } else if (!isCallingNumbers && gameIntervalRef.current) {
+      clearInterval(gameIntervalRef.current);
+      gameIntervalRef.current = null;
+    }
+
+    return () => {
+      if (gameIntervalRef.current) {
+        clearInterval(gameIntervalRef.current);
+      }
+    };
+  }, [gameStarted, isCallingNumbers, winnerId, callNextNumber]);
 
   const handleBuyCards = () => {
     if (gameStarted) {
@@ -58,59 +132,44 @@ const Game = () => {
     setCurrentCalledNumber(null);
     setWinnerId(null);
     calledNumbersIndexRef.current = 0;
+    setIsCallingNumbers(true); // Start auto-calling
     toast.info("Game started! Good luck! 🍀");
   };
 
-  const handleEndGame = () => {
-    setGameStarted(false);
-    setCurrentCalledNumber(null);
-    calledNumbersIndexRef.current = 0;
-    toast.info("Game ended. Thanks for playing!");
+  const handlePauseCalling = () => {
+    setIsCallingNumbers(false);
+    toast.info("Number calling paused.");
   };
 
-  // Game simulation effect
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (gameStarted && !winnerId && calledNumbersIndexRef.current < allPossibleNumbers.length) {
-      interval = setInterval(() => {
-        const nextNumber = allPossibleNumbers[calledNumbersIndexRef.current];
-        setCurrentCalledNumber(nextNumber);
-        setCalledNumbers((prev) => [...prev, nextNumber]);
-        calledNumbersIndexRef.current++;
+  const handleResumeCalling = () => {
+    setIsCallingNumbers(true);
+    toast.info("Number calling resumed.");
+  };
 
-        toast.info(`Number called: ${nextNumber}! 📣`, {
-          duration: 2500,
-          position: "top-center",
-        });
-
-        // Check for bingo after each number is called
-        purchasedCards.forEach((pc) => {
-          if (checkBingo(pc.cardData, [...calledNumbers, nextNumber])) {
-            setWinnerId(pc.id);
-            setGameStarted(false); // End game on first bingo
-            toast.success(`BINGO! Card ${pc.id} is a winner! 🎉`, {
-              duration: 5000,
-              position: "top-center",
-            });
-          }
-        });
-
-        if (calledNumbersIndexRef.current >= allPossibleNumbers.length) {
-          toast.warning("All numbers called! No winner this round. 😔", {
-            duration: 5000,
-            position: "top-center",
-          });
-          setGameStarted(false);
-        }
-
-      }, 3000); // Call a number every 3 seconds
+  const handleManualCall = () => {
+    if (gameStarted && !winnerId) {
+      callNextNumber();
+    } else if (!gameStarted) {
+      showError("Please start the game first.");
     } else if (winnerId) {
-      clearInterval(interval!); // Clear interval if there's a winner
+      showError("Game has a winner. Please start a new game.");
     }
+  };
 
-    return () => clearInterval(interval);
-  }, [gameStarted, purchasedCards, calledNumbers, winnerId]);
-
+  const handleNewGame = () => {
+    if (gameIntervalRef.current) {
+      clearInterval(gameIntervalRef.current);
+      gameIntervalRef.current = null;
+    }
+    setPurchasedCards([]);
+    setCalledNumbers([]);
+    setCurrentCalledNumber(null);
+    setGameStarted(false);
+    setIsCallingNumbers(false);
+    setWinnerId(null);
+    calledNumbersIndexRef.current = 0;
+    toast.success("New game initiated! All previous game data cleared.");
+  };
 
   return (
     <div className="container mx-auto p-4 md:p-8 min-h-[calc(100vh-128px)] flex flex-col items-center justify-center bg-gradient-to-br from-primary/5 to-accent/5">
@@ -185,12 +244,39 @@ const Game = () => {
                 Start Game (Admin Sim) ▶️
               </Button>
             ) : (
-              <Button
-                onClick={handleEndGame}
-                className="w-full sm:w-auto px-8 py-3 text-lg rounded-full bg-red-600 hover:bg-red-700 text-white shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105"
-              >
-                End Game (Admin Sim) ⏹️
-              </Button>
+              <>
+                {isCallingNumbers ? (
+                  <Button
+                    onClick={handlePauseCalling}
+                    className="w-full sm:w-auto px-8 py-3 text-lg rounded-full bg-yellow-600 hover:bg-yellow-700 text-white shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105"
+                  >
+                    <Pause className="h-5 w-5 mr-2" /> Pause Calling
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleResumeCalling}
+                    disabled={winnerId !== null}
+                    className="w-full sm:w-auto px-8 py-3 text-lg rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105"
+                  >
+                    <Play className="h-5 w-5 mr-2" /> Resume Calling
+                  </Button>
+                )}
+                <Button
+                  onClick={handleManualCall}
+                  disabled={isCallingNumbers || winnerId !== null}
+                  variant="outline"
+                  className="w-full sm:w-auto px-8 py-3 text-lg rounded-full border-2 border-blue-500 text-blue-500 hover:bg-blue-500/10 transition-all duration-300 ease-in-out transform hover:scale-105"
+                >
+                  <SkipForward className="h-5 w-5 mr-2" /> Call Next Number
+                </Button>
+                <Button
+                  onClick={handleNewGame}
+                  variant="outline"
+                  className="w-full sm:w-auto px-8 py-3 text-lg rounded-full border-2 border-red-500 text-red-500 hover:bg-red-500/10 transition-all duration-300 ease-in-out transform hover:scale-105"
+                >
+                  <RotateCcw className="h-5 w-5 mr-2" /> New Game
+                </Button>
+              </>
             )}
             <Link to="/">
               <Button variant="outline" className="w-full sm:w-auto px-8 py-3 text-lg rounded-full border-2 border-primary text-primary hover:bg-primary/10 transition-all duration-300 ease-in-out transform hover:scale-105">
@@ -230,7 +316,7 @@ const Game = () => {
               <BingoCardDisplay
                 key={pc.id}
                 card={pc.cardData}
-                calledNumbers={calledNumbers}
+                calledNumbers={calledNumbers} // Still pass calledNumbers for initial check
                 cardId={pc.id}
                 isWinner={winnerId === pc.id}
               />

@@ -167,7 +167,7 @@ const Game = () => {
       <Card className="w-full max-w-4xl text-center p-6 md:p-10 rounded-xl shadow-lg border-primary/20 mb-8">
         <CardHeader>
           <CardTitle className="text-3xl md:text-4xl font-extrabold text-primary mb-4">
-            DegenFamous Game Lobby 🎲
+            DegenFamousBingo Game Lobby 🎲
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -301,7 +301,7 @@ const Game = () => {
 
       {purchasedCards.length > 0 && (
         <div className="w-full max-w-4xl mt-8 space-y-6">
-          <h2 className="text-3xl font-extrabold text-primary text-center mb-6">Your DegenFamous Cards</h2>
+          <h2 className="text-3xl font-extrabold text-primary text-center mb-6">Your DegenFamousBingo Cards</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {purchasedCards.map((pc) => (
               <BingoCardDisplay

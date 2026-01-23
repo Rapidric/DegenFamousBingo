@@ -6,14 +6,14 @@ import { Button } from '@/components/ui/button';
 import { DollarSign, User, Trophy } from 'lucide-react';
 
 const Header = () => {
-  const userName = "BingoPlayer123";
+  const userName = "RapidRic";
   const walletBalance = "100.50 USDT";
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-sm">
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between px-4 md:px-8">
         <Link to="/" className="flex items-center space-x-2">
-          <span className="font-bold text-xl text-primary">DegenFamous! 🎉</span>
+          <span className="font-bold text-xl text-primary">DegenFamousBingo! 🎉</span>
         </Link>
         <nav className="flex items-center space-x-4">
           <div className="hidden md:flex items-center space-x-4">

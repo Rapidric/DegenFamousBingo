@@ -11,7 +11,7 @@ const Index = () => {
       <Card className="w-full max-w-2xl text-center p-6 md:p-10 rounded-xl shadow-lg border-primary/20">
         <CardHeader>
           <CardTitle className="text-4xl md:text-5xl font-extrabold text-primary mb-4 animate-pulse">
-            Welcome to DegenFamous! 🎉
+            Welcome to DegenFamousBingo! 🎉
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">

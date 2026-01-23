@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 const Profile = () => {
   const userId = "telegram_user_12345";
-  const userName = "BingoPlayer123";
+  const userName = "RapidRic";
   const walletBalance = "100.50 USDT";
   const transactionHistory = [
     { id: "tx1", type: "Purchase", amount: "-$1.00", date: "2023-10-26 10:30 AM", status: "Completed" },

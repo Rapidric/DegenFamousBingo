@@ -32,7 +32,7 @@ const Leaderboard = () => {
             <Trophy className="h-8 w-8 text-yellow-500" /> Global Leaderboard <Trophy className="h-8 w-8 text-yellow-500" />
           </CardTitle>
           <p className="text-lg md:text-xl text-foreground/80 leading-relaxed">
-            See who's dominating the Bingo Blitz arena!
+            See who's dominating the DegenFamous arena!
           </p>
         </CardHeader>
         <CardContent className="space-y-8">

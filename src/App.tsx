@@ -9,7 +9,8 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Game from "./pages/Game";
 import Admin from "./pages/Admin";
-import Profile from "./pages/Profile"; // Import the new Profile page
+import Profile from "./pages/Profile";
+import Leaderboard from "./pages/Leaderboard"; // Import the new Leaderboard page
 
 const queryClient = new QueryClient();
 
@@ -26,7 +27,8 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/game" element={<Game />} />
               <Route path="/admin" element={<Admin />} />
-              <Route path="/profile" element={<Profile />} /> {/* Add the new Profile route */}
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/leaderboard" element={<Leaderboard />} /> {/* Add the new Leaderboard route */}
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

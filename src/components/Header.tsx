@@ -3,7 +3,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { DollarSign, User, Wallet } from "lucide-react"; // Import Wallet icon
+import { DollarSign, User, Wallet, Trophy } from "lucide-react"; // Import Trophy icon for leaderboard
 
 const Header = () => {
   // Placeholder for user data and wallet balance
@@ -28,9 +28,14 @@ const Header = () => {
                 Admin
               </Button>
             </Link>
-            <Link to="/profile"> {/* New link to Profile page */}
+            <Link to="/profile">
               <Button variant="ghost" className="rounded-lg text-primary hover:bg-accent hover:text-primary">
                 Profile
+              </Button>
+            </Link>
+            <Link to="/leaderboard"> {/* New link to Leaderboard page */}
+              <Button variant="ghost" className="rounded-lg text-primary hover:bg-accent hover:text-primary">
+                <Trophy className="h-4 w-4 mr-1" /> Leaderboard
               </Button>
             </Link>
           </div>

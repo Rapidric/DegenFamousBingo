@@ -10,6 +10,7 @@ import { Play, Pause, SkipForward, RotateCcw } from "lucide-react";
 import { BingoCard, generateBingoCard, generateCalledNumbers, checkBingo } from "@/utils/bingo";
 import { showSuccess, showError, showLoading, dismissToast } from "@/utils/toast";
 import BingoCardDisplay from "@/components/BingoCardDisplay";
+import CalledNumbersDisplay from "@/components/CalledNumbersDisplay"; // Import the new component
 import { cn } from "@/lib/utils";
 
 interface PurchasedCard {
@@ -281,12 +282,21 @@ const Game = () => {
         </CardContent>
       </Card>
 
-      {gameStarted && currentCalledNumber !== null && (
-        <div className="w-full max-w-4xl mt-8 text-center p-6 rounded-xl shadow-lg border-accent/30 bg-accent/10 animate-pulse">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-primary mb-2">
-            Calling: <span className="text-destructive">{currentCalledNumber}</span>! 🔔
-          </h2>
-          <p className="text-lg text-muted-foreground">Numbers called so far: {calledNumbers.join(", ")}</p>
+      {gameStarted && (
+        <div className="w-full max-w-4xl mt-8 space-y-6">
+          {currentCalledNumber !== null && (
+            <div className="text-center p-6 rounded-xl shadow-lg border-accent/30 bg-accent/10 animate-pulse">
+              <h2 className="text-4xl md:text-5xl font-extrabold text-primary mb-2">
+                Calling: <span className="text-destructive">{currentCalledNumber}</span>! 🔔
+              </h2>
+              <p className="text-lg text-muted-foreground">Numbers called so far: {calledNumbers.length}</p>
+            </div>
+          )}
+
+          <CalledNumbersDisplay
+            calledNumbers={calledNumbers}
+            currentCalledNumber={currentCalledNumber}
+          />
         </div>
       )}
 
